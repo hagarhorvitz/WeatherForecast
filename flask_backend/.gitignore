@@ -1,4 +1,5 @@
 /.vscode
 /weatherVE
+__pycache__
 .env
-/__pycache__
+
