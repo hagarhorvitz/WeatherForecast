@@ -6,8 +6,6 @@ api_weather_blueprint = Blueprint("api_view", __name__)
 
 @api_weather_blueprint.route('/weather', methods=['GET'])
 def get_weather():
-    # latitude = request.args.get('latitude')
-    # longitude = request.args.get('longitude')
     try:
         query_params = request.args.to_dict()
         required_params = ["latitude", "longitude"]
