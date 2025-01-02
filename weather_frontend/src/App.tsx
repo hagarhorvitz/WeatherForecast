@@ -28,13 +28,16 @@ function App() {
     function sendWeatherData(weather: WeatherFormModel) {
         console.log('weather', weather)
         setNewWeather(weather)
-        console.log('newWeather', newWeather)
     }
+    console.log('newWeather', newWeather)
 
     useEffect(() => {
         async function getWeatherData() {
+            if (!newWeather) return;
             try {
+                console.log('newWeather', newWeather)
                 const response = await weatherService.fetchWeather(newWeather);
+                console.log('response', response)
                 setWeatherData(response)
             }
             catch (err) {
@@ -42,14 +45,14 @@ function App() {
             }
         }
         getWeatherData()
-        console.log('weatherData', weatherData)
-    }, [newWeather, weatherData])
+    }, [newWeather])
+    console.log('weatherData', weatherData)
 
     return (
         <div>
             <h1>Weather App</h1>
             {
-                !newWeather && <div>
+                !weatherData && <div>
                     <WeatherForm sendWeatherData={sendWeatherData} />
                 </div>
             }

@@ -7,12 +7,32 @@ api_weather_blueprint = Blueprint("api_view", __name__)
 @api_weather_blueprint.route('/weather', methods=['GET'])
 def get_weather():
     try:
-        query_params = request.args.to_dict()
-        required_params = ["latitude", "longitude"]
-        missing_params = [param for param in required_params if param not in query_params]
-        if missing_params:
-            return jsonify({"error": f"Missing required parameters: {', '.join(missing_params)}"}), 400
+        # query_params = request.args.to_dict(flat=False)
+        # required_params = ["latitude", "longitude"]
+        # missing_params = [param for param in required_params if param not in query_params]
+
+        latitude = request.args.get("latitude")
+        longitude = request.args.get("longitude")
+        timezone = request.args.get("timezone")
+        hourly = query_params.get("hourly", "").split(",")
+        daily = request.args.get("daily", "").split(",")
+        past_days = request.args.get("past_days")
+        forecast_days = request.args.get("forecast_days")
         
+        if not latitude or not longitude:
+            return jsonify({"error": f"Missing required parameter latitude or longitude"}), 400
+        
+        query_params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "timezone": timezone,
+            "hourly": ",".join(hourly),
+            "daily": ",".join(daily),
+            "past_days": past_days,
+            "forecast_days": forecast_days,
+        }
+        print("query_params: ", query_params)
+
         response = requests.get(AppConfig.base_url, params=query_params)
         if response.status_code != 200:
             return jsonify({
@@ -20,9 +40,8 @@ def get_weather():
                 "details": response.text
             }), response.status_code
         
-        weather_data = response.json()
-        print("weather_data: ", weather_data)
-        return jsonify(weather_data), 200
+        print("response.json(): ", response.json())
+        return jsonify(response.json()), 200
     except Exception as err:
         return jsonify({
             "error": "Internal server error",

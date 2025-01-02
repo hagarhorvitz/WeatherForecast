@@ -8,6 +8,11 @@ import css from "./WeatherDisplay.module.css";
 
 export function WeatherDisplay(props: WeatherModel): JSX.Element {
 
+    const { hourlyUnitsObj } = { ...props?.hourly_units }
+    const { hourlyObj } = { ...props?.hourly }
+    const { dailyUnitsObj } = { ...props?.daily_units }
+    const { dailyUObj } = { ...props?.daily }
+
     return (
         <div className={css.WeatherDisplay}>
             <h2>Weather Data</h2>
@@ -28,14 +33,14 @@ export function WeatherDisplay(props: WeatherModel): JSX.Element {
                     }
                     {
                         props?.hourly && <span>
-                            <h4>Hourly: {props?.hourly}</h4>
-                            <h4>Hourly Units: {props?.hourly_units}</h4>
+                            <h4>Hourly Units: {hourlyUnitsObj}</h4>
+                            <h4>Hourly: {hourlyObj}</h4>
                         </span>
                     }
                     {
                         props?.daily && <span>
-                            <h4>Daily: {props?.daily}</h4>
-                            <h4>Daily Units: {props?.daily_units}</h4>
+                            <h4>Daily Units: {dailyUnitsObj}</h4>
+                            <h4>Daily: {dailyUObj}</h4>
                         </span>
                     }
                 </div>
