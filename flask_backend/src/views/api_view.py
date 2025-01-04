@@ -14,11 +14,12 @@ def get_weather():
         latitude = request.args.get("latitude")
         longitude = request.args.get("longitude")
         timezone = request.args.get("timezone")
-        hourly = query_params.get("hourly", "").split(",")
+        hourly = request.args.get("hourly", "").split(",")
         daily = request.args.get("daily", "").split(",")
         past_days = request.args.get("past_days")
         forecast_days = request.args.get("forecast_days")
-        
+        print("hourly: ", hourly)
+        print("daily: ", daily)
         if not latitude or not longitude:
             return jsonify({"error": f"Missing required parameter latitude or longitude"}), 400
         
@@ -26,14 +27,16 @@ def get_weather():
             "latitude": latitude,
             "longitude": longitude,
             "timezone": timezone,
-            "hourly": ",".join(hourly),
-            "daily": ",".join(daily),
+            "hourly": hourly,
+            "daily": daily,
             "past_days": past_days,
             "forecast_days": forecast_days,
         }
         print("query_params: ", query_params)
-
+        print("query_params.v: ", query_params.values())
+        
         response = requests.get(AppConfig.base_url, params=query_params)
+        print("response: ", response)
         if response.status_code != 200:
             return jsonify({
                 "error": "Failed to fetch weather data",
