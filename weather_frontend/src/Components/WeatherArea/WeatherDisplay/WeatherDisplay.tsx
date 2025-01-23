@@ -7,10 +7,6 @@ interface WeatherDisplayProps {
 
 export function WeatherDisplay({ weather }: WeatherDisplayProps): JSX.Element {
 
-    const { hourlyUnitsObj } = { ...weather?.hourly_units }
-    const { hourlyObj } = { ...weather?.hourly }
-    const { dailyUnitsObj } = { ...weather?.daily_units }
-    const { dailyUObj } = { ...weather?.daily }
 
     return (
         <div className={css.WeatherDisplay}>
@@ -32,14 +28,38 @@ export function WeatherDisplay({ weather }: WeatherDisplayProps): JSX.Element {
                     }
                     {
                         weather?.hourly && <span>
-                            <h4>Hourly Units: {hourlyUnitsObj}</h4>
-                            <h4>Hourly: {hourlyObj}</h4>
+                            <h4>Hourly Units:</h4>
+                            <ul>
+                                <li>time: {weather?.hourly_units.time}</li>
+                                {Object.entries(weather?.hourly_units).map(([key, value]) => (
+                                    key !== 'time' && <li key={key}>{key}: {value}</li>
+                                ))}
+                            </ul>
+                            <h4>Hourly:</h4>
+                            <ul>
+                                <li>time: {weather?.hourly.time.join(", ")}</li>
+                                {Object.entries(weather?.hourly).map(([key, value]) => (
+                                    key !== 'time' && <li key={key} style={{wordBreak: 'break-all'}}>{key}: {value.join(", ")}</li>
+                                ))}
+                            </ul>
                         </span>
                     }
                     {
                         weather?.daily && <span>
-                            <h4>Daily Units: {dailyUnitsObj}</h4>
-                            <h4>Daily: {dailyUObj}</h4>
+                            <h4>Daily Units:</h4>
+                            <ul>
+                                <li>time: {weather?.daily_units.time}</li>
+                                {Object.entries(weather?.daily_units).map(([key, value]) => (
+                                    key !== 'time' && <li key={key}>{key}: {value}</li>
+                                ))}
+                            </ul>
+                            <h4>Daily:</h4>
+                            <ul>
+                                <li>time: {weather?.daily.time.join(", ")}</li>
+                                {Object.entries(weather?.daily).map(([key, value]) => (
+                                    key !== 'time' && <li key={key} style={{wordBreak: 'break-all'}}>{key}: {value.join(", ")}</li>
+                                ))}
+                            </ul>
                         </span>
                     }
                 </div>

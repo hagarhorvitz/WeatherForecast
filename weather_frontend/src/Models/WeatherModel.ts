@@ -7,7 +7,7 @@ export class WeatherModel {
     timezone: string;
     timezone_abbreviation: string;
     hourly_units: {
-        time: string;
+        time: string,
         [key: string]: string;
     };
     hourly: {
