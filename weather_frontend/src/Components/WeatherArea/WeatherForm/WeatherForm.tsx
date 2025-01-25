@@ -142,7 +142,7 @@ export function WeatherForm({ submitWeatherData }: FormSubmissionProps): JSX.Ele
                         value={newWeather?.timezone}
                         onChange={(e)=>setNewWeather({...newWeather, timezone: e.target.value})}
                     >
-                        <option value="">Not set (GMT+0)</option>
+                        <option value="" disabled>Not set (GMT+0)</option>
                         <option value="America/Anchorage">America/Anchorage</option>
                         <option value="America/Los_Angeles">America/Los Angeles</option>
                         <option value="America/Denver">America/Denver</option>

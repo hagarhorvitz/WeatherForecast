@@ -15,10 +15,9 @@ class WeatherModel:
     @staticmethod
     def check_days(number, days_list):
         for day in days_list:
-            if number == day:
+            if int(number) == day:
                 return True
         return False
-
 
     def validation_parameters(self):
         if not self.latitude: return "Latitude is required, please enter"
@@ -32,5 +31,17 @@ class WeatherModel:
         if float(self.longitude) < -180 or float(self.longitude) > 180: return "Latitude must be between -180 and 180"
         if self.check_days(self.past_days, self.past_days_options) == False: return "'Past day' selected is not valid, please select from the options only"
         if self.check_days(self.forecast_days, self.forecast_days_options) == False: return "'Forecast day' selected is not valid, please select from the options only"
+        if (len(self.hourly) <= 0 or self.hourly[0] == '') or (len(self.daily) <= 0 or self.daily[0] == ''): return "Selecting options are required, please select at least one"
         return None
+    
+    def parameters_to_dict(self):
+        return {
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "timezone": self.timezone,
+            "hourly": self.hourly,
+            "daily": self.daily,
+            "past_days": self.past_days,
+            "forecast_days": self.forecast_days,
+        }
     
