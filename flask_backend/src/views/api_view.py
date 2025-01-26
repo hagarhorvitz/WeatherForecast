@@ -55,17 +55,22 @@ weather_facade = WeatherFacade()
 def get_weather():
     try:
         response = weather_facade.get_weather_data()
-        print("##view## response.json():\n", response.json())
+        if (response.status_code < 400 and response.status_code != 200):
+            raise GetError(f"Unexpected status code: {response.status_code}", response.status_code)
+        print(f"##view## response.json():\n{response.json()}")
         return jsonify(response.json()), 200
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTPError: {str(err.response.text)}\nstatus_code: {err.response.status_code}")
+        return jsonify({"Error": f"HTTP Error: {str(err.response.text)}"}), err.response.status_code
+    except requests.exceptions.RequestException as err:
+        print(f"RequestException: {str(err)}")
+        return jsonify({"Error": f"Requests Error: {str(err)}"}), 500
     except ValidationError as err:
-        print("ValidationError str(err.message): ", str(err.message),"\n"
-        "ValidationError err.status_code: ", err.status_code)
-        return jsonify({
-            "Error": str(err.message),
-        }), err.status_code
+        print(f"ValidationError: {str(err.message)}\nstatus_code: {err.status_code}")
+        return jsonify({"Error": str(err.message)}), err.status_code
     except GetError as err:
-        print("GetError str(err.message): ", str(err.message),"\n"
-        "GetError err.status_code: ", err.status_code)
-        return jsonify({
-            "Error": str(err.message),
-        }), err.status_code
+        print(f"GetError: {str(err.message)}\nstatus_code: {err.status_code}")
+        return jsonify({"Error": str(err.message)}), err.status_code
+    except Exception as err:
+        print(f"ExceptionError: {str(err)}")
+        return jsonify({"Error": f"An unexpected general error occurred: {str(err)}"}), 500
