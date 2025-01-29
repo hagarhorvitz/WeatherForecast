@@ -12,5 +12,4 @@ class WeatherLogic:
         print(f"##logic## response.text:\n{response.text}")
         response.raise_for_status()
         return response
-        # return self.response.get(AppConfig.base_url, params=weather)
 

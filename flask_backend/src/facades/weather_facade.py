@@ -18,7 +18,6 @@ class WeatherFacade:
         forecast_days = request.args.get("forecast_days")
         new_weather = WeatherModel(latitude, longitude, timezone, hourly, daily, past_days, forecast_days)
         error = new_weather.validation_parameters()
-        print(f"##facade## error:\n{error}")
         if error: raise ValidationError(error, StatusCode.BadRequest.value, new_weather)
         weather = new_weather.parameters_to_dict()
         print(f"##facade## weather:\n{weather}")
