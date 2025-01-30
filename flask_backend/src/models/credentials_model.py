@@ -1,4 +1,3 @@
-import re
 from email_validator import EmailNotValidError, validate_email
 
 class CredentialModel:

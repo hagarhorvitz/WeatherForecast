@@ -35,9 +35,6 @@ def get_weather():
     except ValidationError as err:
         print(f"ValidationError: {str(err.message)}\nstatus_code: {err.status_code}")
         return jsonify({"Error": str(err.message)}), err.status_code
-    except GetError as err:
-        print(f"GetError: {str(err.message)}\nstatus_code: {err.status_code}")
-        return jsonify({"Error": str(err.message)}), err.status_code
     except Exception as err:
         print(f"ExceptionError: {str(err)}")
         return jsonify({"Error": f"An unexpected general error occurred: {str(err)}"}), StatusCode.InternalServerError.value

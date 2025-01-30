@@ -1,5 +1,3 @@
-import re
-from email_validator import EmailNotValidError
 from flask import request
 from models.users_model import UsersModel
 from logic.users_logic import UsersLogic
