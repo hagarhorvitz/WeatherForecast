@@ -2,9 +2,9 @@ import requests
 from app import app
 from models.status_code_model import StatusCode
 
-def test_get_weather_success(client, valid_params):
+def test_get_weather_success(client, valid_weather_params):
     """✅ Test successful weather API response with real Open-Meteo request"""
-    response = client.get("/weather", query_string=valid_params)
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.OK.value  # ✅ Open-Meteo should return 200 OK
     data = response.get_json()
     assert "latitude" in data
@@ -16,97 +16,111 @@ def test_get_weather_success(client, valid_params):
     # assert isinstance(data["longitude"], float)
 
 
-def test_get_weather_missing_latitude(client, valid_params):
-    del valid_params["latitude"]
-    response = client.get("/weather", query_string=valid_params)
+def test_missing_latitude(client, valid_weather_params):
+    del valid_weather_params["latitude"]
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.BadRequest.value  # ❌ Open-Meteo should return 400
     data = response.get_json()
     assert "Error" in data
 
 
-def test_get_weather_missing_longitude(client, valid_params):
-    del valid_params["longitude"]
-    response = client.get("/weather", query_string=valid_params)
+def test_missing_longitude(client, valid_weather_params):
+    del valid_weather_params["longitude"]
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.BadRequest.value  # ❌ Open-Meteo should return 400
     data = response.get_json()
     assert "Error" in data
 
 
-def test_get_weather_invalid_latitude(client, valid_params):
-    valid_params["latitude"] = "9999"
-    response = client.get("/weather", query_string=valid_params)
+def test_invalid_latitude(client, valid_weather_params):
+    valid_weather_params["latitude"] = 9999
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.BadRequest.value  # ❌ Open-Meteo should return 400
     data = response.get_json()
     assert "Error" in data
 
 
-def test_get_weather_invalid_longitude(client, valid_params):
-    valid_params["longitude"] = "-9999"
-    response = client.get("/weather", query_string=valid_params)
+def test_invalid_longitude(client, valid_weather_params):
+    valid_weather_params["longitude"] = int(-9999)
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.BadRequest.value  # ❌ Open-Meteo should return 400
     data = response.get_json()
     assert "Error" in data
 
 
-def test_get_weather_invalid_timezone(client, valid_params):
-    valid_params["timezone"] = "Fake/Timezone"
-    response = client.get("/weather", query_string=valid_params)
+def test_invalid_timezone(client, valid_weather_params):
+    valid_weather_params["timezone"] = "Fake/Timezone"
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.BadRequest.value  # ❌ Open-Meteo should return 400
     data = response.get_json()
     assert "Error" in data
 
 
-def test_get_weather_invalid_forecast_days(client, valid_params):
-    """✅ Test forecast_days set to 0 (edge case)"""
-    valid_params["forecast_days"] = 5
-    response = client.get("/weather", query_string=valid_params)
-    assert response.status_code == StatusCode.OK.value  # ✅ Open-Meteo allows this
+def test_invalid_forecast_days(client, valid_weather_params):
+    valid_weather_params["forecast_days"] = 5
+    response = client.get("/weather", query_string=valid_weather_params)
+    assert response.status_code == StatusCode.BadRequest.value  # ❌ Open-Meteo should return 400
     data = response.get_json()
-    assert "daily" in data  # Should still return daily weather data
+    assert "Error" in data
 
 
-def test_get_weather_max_forecast_days(client, valid_params):
-    """✅ Test maximum forecast days allowed"""
-    valid_params["forecast_days"] = "16"  # Open-Meteo supports up to 16 days
-    response = client.get("/weather", query_string=valid_params)
+def test_largest_forecast_day(client, valid_weather_params):
+    valid_weather_params["forecast_days"] = 16  # Open-Meteo supports up to 16 days
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.OK.value  # ✅ Should work
     data = response.get_json()
     assert "daily" in data
 
-def test_get_weather_exceed_forecast_days(client, valid_params):
-    """❌ Test exceeding maximum forecast days"""
-    valid_params["forecast_days"] = "30"  # Open-Meteo supports only up to 16 days
-    response = client.get("/weather", query_string=valid_params)
-    assert response.status_code == StatusCode.BadRequest.value  # ❌ Should fail
-    data = response.get_json()
-    assert "Error" in data
 
-def test_get_weather_past_days_negative(client, valid_params):
-    """❌ Test negative past_days value"""
-    valid_params["past_days"] = "-5"  # Invalid past_days
-    response = client.get("/weather", query_string=valid_params)
+def test_smallest_forecast_day(client, valid_weather_params):
+    valid_weather_params["forecast_days"] = 1  # Open-Meteo supports up to 16 days
+    response = client.get("/weather", query_string=valid_weather_params)
+    assert response.status_code == StatusCode.OK.value  # ✅ Should work
+    data = response.get_json()
+    assert "daily" in data
+
+
+def test_negative_past_days(client, valid_weather_params):
+    valid_weather_params["past_days"] = int(-4) 
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.BadRequest.value  # ❌ Should return error
     data = response.get_json()
     assert "Error" in data
 
-def test_get_weather_large_past_days(client, valid_params):
-    """✅ Test large past_days value"""
-    valid_params["past_days"] = "30"  # Maximum allowed past days
-    response = client.get("/weather", query_string=valid_params)
+
+def test_largest_past_day(client, valid_weather_params):
+    valid_weather_params["past_days"] = 92 
+    response = client.get("/weather", query_string=valid_weather_params)
     assert response.status_code == StatusCode.OK.value  # ✅ Should work
     data = response.get_json()
-    assert "daily" in data  # Should still return daily data
+    assert "daily" in data 
 
-def test_get_weather_real_request_no_params(client):
-    """❌ Test request with no parameters (should fail)"""
+
+def test_get_weather_request_no_params(client):
     response = client.get("/weather")  # No query params
     assert response.status_code == StatusCode.BadRequest.value  # ❌ Should return 400
     data = response.get_json()
     assert "Error" in data
 
-def test_get_weather_real_request_invalid_endpoint(client):
-    """❌ Test invalid endpoint"""
-    response = client.get("/invalid_endpoint")  # Wrong API route
+
+def test_get_weather_request_invalid_endpoint(client, valid_weather_params):
+    response = client.get("/invalid_endpoint", query_string=valid_weather_params)  # Wrong API route
     assert response.status_code == StatusCode.NotFound.value  # ❌ Should return 404
+    data = response.get_json() if response.is_json else {}
+    assert "Error" in data
+
+
+def test_invalid_hourly(client, valid_weather_params):
+    valid_weather_params["hourly"] = "temture_2m"
+    response = client.get("/weather", query_string=valid_weather_params)
+    assert response.status_code == StatusCode.BadRequest.value  # ❌ Open-Meteo should return 400
+    data = response.get_json()
+    assert "Error" in data
+
+
+def test_invalid_daily(client, valid_weather_params):
+    valid_weather_params["daily"] = ["sunrise, sunset"]
+    response = client.get("/weather", query_string=valid_weather_params)
+    assert response.status_code == StatusCode.BadRequest.value  # ❌ Open-Meteo should return 400
     data = response.get_json()
     assert "Error" in data
