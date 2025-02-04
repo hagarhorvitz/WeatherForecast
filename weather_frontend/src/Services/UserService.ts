@@ -2,8 +2,8 @@ import axios from "axios";
 import { appConfig } from "../Utils/AppConfig";
 import { jwtDecode } from "jwt-decode";
 import { UserModel } from "../Models/UserModel";
-import { CredentialModel } from "../Models/CredentialModel";
 import { RegisterUserProps } from "../Models/RegisterUserProps";
+import { CredentialProps } from "../Models/CredentialProps";
 
 class UserServices {
     // public constructor(){
@@ -15,41 +15,37 @@ class UserServices {
     //     store.dispatch(action);
     // };
 
-    public async register(newUser:RegisterUserProps): Promise<void>{
+    public async register(newUser:RegisterUserProps): Promise<string>{
+        // The server returns just a token (string), or an object with token. Adjust as needed.
         const response = await axios.post<string>(appConfig.registerUrl, newUser);
-        const token = response.data;
-        console.log("register token: ", token);
+        console.log("register response: ", response);
 
-        const dbUser = jwtDecode<{user: UserModel}>(token).user;
-        console.log("register dbUser: ", dbUser);
+        const token = response.data;  // Typically the token is the response (or an object with token)
+        // You can decode here if you want to confirm
+        const decodedUser = jwtDecode<{user: UserModel}>(token).user;
+        console.log("register ##token (response.data): ", token, "##decodedUser: ", decodedUser);
 
-        // const action = userActions.register(dbUser); // create action object containing register user
-        // store.dispatch(action);
-
-        localStorage.setItem("token", token); // save token to local storage
+        // Store token in local storage (optional, or let the context do it)
+        localStorage.setItem("token", token);
+        return token
     };
 
-	public async login(credential: CredentialModel):Promise<void>{    
-        const response = await axios.post<string>(appConfig.loginUrl, credential);     
+	public async login(credential: CredentialProps):Promise<string>{    
+        const response = await axios.post<string>(appConfig.loginUrl, credential);   
+        console.log("login response: ", response);  
+
         const token = response.data;
-        console.log("login token: ", token);
-        const dbUser = jwtDecode<{user: UserModel}>(token).user;
-        console.log("login dbUser: ", dbUser);
+        const decodedUser = jwtDecode<{user: UserModel}>(token).user;
+        console.log("login ##token (response.data): ", token, "##decodedUser: ", decodedUser);
 
-        // const action = userActions.login(dbUser);
-        // store.dispatch(action);
-
+        // Optionally store in local storage
         localStorage.setItem("token", token);
+        return token
     };
 
     
-    public async logout(user: UserModel):Promise<void> {
-        const response = await axios.post<object>(appConfig.logoutUrl, user);  
-        console.log("logout response: ", response);
-        // const action = userActions.logout(); 
-        // store.dispatch(action); 
-        // const removeItemsArr = ["token", "totalVacations", "totalUsers", "totalLikes", "likesByDestination"]
-        // removeItemsArr.forEach( item => localStorage.removeItem(item));
+    public async log_out():Promise<void> {
+        localStorage.removeItem("token");
     };
 }
 

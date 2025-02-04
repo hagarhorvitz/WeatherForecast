@@ -9,7 +9,7 @@ class CredentialModel:
     def validate_login_by_email(self):
         if not self.identifier: return "Missing email, please enter or change to login with username"
         if not self.password: return "Missing password, please enter"
-        if len(self.identifier) < 4 or len(self.identifier) > 80: return "Please ensure you entered a valid email length"
+        if len(self.identifier) < 5 or len(self.identifier) > 80: return "Please ensure you entered a valid email length"
         if len(self.password) < 4 or len(self.password) > 20: return "Please ensure you entered a valid password length"
         try:
             validate_email(self.identifier)
