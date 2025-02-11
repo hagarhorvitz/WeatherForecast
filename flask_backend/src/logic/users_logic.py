@@ -9,13 +9,13 @@ class UsersLogic:
     def get_user_by_email_and_password(self, email, password):
         query = "SELECT user_id, first_name, last_name, username, email FROM open_meteo_weather.users WHERE email = %s AND password = %s"
         result = self.dal.get_scalar(query, (email, password))
-        print(f"result email: {result}")
+        print(f"##Logic## email: {result}")
         return result
     
     def get_user_by_username_and_password(self, username, password):
         query = "SELECT user_id, first_name, last_name, username, email FROM open_meteo_weather.users WHERE username = %s AND password = %s"
         result = self.dal.get_scalar(query, (username, password))
-        print(f"result username: {result}")
+        print(f"##Logic## username: {result}")
         return result
     
     # def get_user(self, hash_password, identifier):

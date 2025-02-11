@@ -1,52 +1,51 @@
 import axios from "axios";
 import { appConfig } from "../Utils/AppConfig";
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 import { UserModel } from "../Models/UserModel";
 import { RegisterUserProps } from "../Models/RegisterUserProps";
 import { CredentialProps } from "../Models/CredentialProps";
 
 class UserServices {
-    // public constructor(){
-    //     const token = localStorage.getItem("token");
-    //     if(!token) return;
 
-    //     const dbUser = jwtDecode<{user: UserModel}>(token).user;
-    //     const action = userActions.login(dbUser);
-    //     store.dispatch(action);
-    // };
-
-    public async register(newUser:RegisterUserProps): Promise<string>{
-        // The server returns just a token (string), or an object with token. Adjust as needed.
-        const response = await axios.post<string>(appConfig.registerUrl, newUser);
+    public async register(newUser:RegisterUserProps): Promise<UserModel>{
+        const response = await axios.post(appConfig.registerUrl, newUser,{ withCredentials: true }  );
         console.log("register response: ", response);
-
-        const token = response.data;  // Typically the token is the response (or an object with token)
-        // You can decode here if you want to confirm
-        const decodedUser = jwtDecode<{user: UserModel}>(token).user;
-        console.log("register ##token (response.data): ", token, "##decodedUser: ", decodedUser);
-
-        // Store token in local storage (optional, or let the context do it)
-        localStorage.setItem("token", token);
-        return token
+        console.log("##service login## response.data: ", response.data); 
+        console.log("##service login## response.data.user: ", response.data.user); 
+        return response.data.user;
     };
 
-	public async login(credential: CredentialProps):Promise<string>{    
-        const response = await axios.post<string>(appConfig.loginUrl, credential);   
-        console.log("login response: ", response);  
+	public async login({username, email, password}: CredentialProps):Promise<UserModel>{
+        console.log("##service login## CredentialProps: username-", username, "email-", email, "password-",password);
+        
+        const params = username !== null ? { "username": username, "password": password } : { "email": email, "password": password };
+        console.log("##service login## params: ", params);
 
-        const token = response.data;
-        const decodedUser = jwtDecode<{user: UserModel}>(token).user;
-        console.log("login ##token (response.data): ", token, "##decodedUser: ", decodedUser);
-
-        // Optionally store in local storage
-        localStorage.setItem("token", token);
-        return token
+        const response = await axios.post(appConfig.loginUrl, params, { withCredentials: true }  );   
+        console.log("##service login## response: ", response);  
+        console.log("##service login## response.data: ", response.data); 
+        console.log("##service login## response.data.user: ", response.data.user); 
+        return response.data.user;
     };
 
-    
-    public async log_out():Promise<void> {
-        localStorage.removeItem("token");
+    public async logout():Promise<void> {
+        console.log("Attempting logout...");  // ✅ Debugging log before request
+        try {
+            const response = await axios.post(appConfig.logoutUrl, {}, { withCredentials: true }  );// ✅ Ensures cookies are cleared server-side
+            console.log("##service log_out## response: ", response);
+            console.log("##service log_out## response.data: ", response.data);
+            console.log("##service log_out## response.data.message: ", response.data.message);
+        } catch (err) {
+            console.error("##service Logout failed:", err);
+        }
     };
+
+    public async getUserInfo():Promise<UserModel> {
+        const response = await axios.get(appConfig.getUserUrl, { withCredentials: true }  );   
+        console.log("##service getUserInfo## response: ", response);
+        console.log("##service getUserInfo## response.data.user: ", response.data.user);
+        return response.data.user; // Return user data
+}
 }
 
 export const userService = new UserServices();

@@ -1,38 +1,47 @@
 import { useEffect, useState } from "react";
 import css from "./LoginForm.module.css";
 import { userService } from "../../../Services/UserService";
-import { Box, Button, IconButton, InputAdornment, OutlinedInput, Stack, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, InputLabel, OutlinedInput, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { CredentialProps } from "../../../Models/CredentialProps";
 import { useNotify } from "../../../Context/NotifyContext";
 import { useAuth } from "../../../Context/AuthContext";
 
-export function LoginForm(): JSX.Element {
+interface LoginProps {
+    loginBy: string;
+}
+
+export function LoginForm({ loginBy }: LoginProps): JSX.Element {
     const { notify } = useNotify();
-    const { setToken } = useAuth();
+    const { setUser } = useAuth();
 
     const [formData, setFormData] = useState<CredentialProps>({
-        identifier: "",
+        username: null,
+        email: null,
         password: "",
     });
     const [disable, setDisable] = useState<boolean>(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [isPressed, setIsPressed] = useState(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [isPressed, setIsPressed] = useState<boolean>(false);
 
     const [objError, setObjError] = useState({
         identifierError: false,
         passwordError: false
     });
 
-    function checkError():void {
-        if (formData?.identifier?.length < 4 && formData?.identifier?.length !== 0) objError.identifierError = true; else objError.identifierError = false
+    useEffect(() => {
+        setFormData({ ...formData, username: null, email: null })  
+    }, [loginBy]);
+
+    function checkError(): void {
+        if ((formData?.username?.length < 4 && formData?.username?.length !== 0) || (formData?.email?.length < 4 && formData?.email?.length !== 0)) objError.identifierError = true; else objError.identifierError = false
         if (formData?.password?.length < 4 && formData?.password?.length !== 0 && formData?.password?.length > 20) objError.passwordError = true; else objError.passwordError = false
         setObjError({ ...objError });
     };
 
-    function checkEnable(){
-        if (formData?.identifier?.length > 4 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
+    function checkEnable() {
+        if ((formData?.username?.length || formData?.email?.length) > 4 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
     };
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -62,8 +71,9 @@ export function LoginForm(): JSX.Element {
     const navigate = useNavigate();
     async function loginUser() {
         try {
-            const token = await userService.login(formData);
-            setToken(token);
+            const userData = await userService.login(formData);
+            console.log("loginForm userData: ", userData);
+            setUser(userData);
             notify.success("Login successfully!", 4000)
             navigate("/home")
         }
@@ -71,48 +81,74 @@ export function LoginForm(): JSX.Element {
             notify.error(err, 4500);
         }
     };
+    const styleLabel = {
+        color: "#004a4d",
+        alignSelf: 'flex-start',
+        paddingLeft: 1,
+        fontSize: 'large',
+        fontWeight: '500',
+    };
+
     return (
         <div className={css.LoginForm}>
-			<Box
+            <Typography variant="h5" gutterBottom>
+                Login
+            </Typography>
+            <Box
                 component="form"
                 onKeyDown={handleKeyDown}
                 sx={{ maxWidth: 400, mx: "auto", mt: 4 }}
             >
-                <Typography variant="h5" gutterBottom>
-                    Register
-                </Typography>
                 <Stack spacing={2}>
-                    <OutlinedInput
-                        error={objError.identifierError}
-                        label="Username"
-                        id="usernameBox"
-                        name="username"
-                        type="text"
-                        fullWidth
-                        value={formData?.identifier}
-                        onChange={(e)=> setFormData({...formData, identifier: e.target.value})}
-                        onKeyDown={checkError}
-                        onKeyUp={checkEnable}
-                    />
-                    <OutlinedInput
-                        error={objError.identifierError}
-                        label="Email"
-                        id="emailBox"
-                        name="email"
-                        type="email"
-                        fullWidth
-                        value={formData?.identifier}
-                        onChange={(e)=> setFormData({...formData, identifier: e.target.value})}
-                        onKeyDown={checkError}
-                        onKeyUp={checkEnable}
-                    />
+                    {
+                        loginBy === "username" && <div>
+                            <InputLabel htmlFor="usernameBox"
+                                sx={styleLabel}>
+                                Username:
+                            </InputLabel>
+                            <OutlinedInput
+                                error={objError.identifierError}
+                                id="usernameBox"
+                                name="username"
+                                type="text"
+                                fullWidth
+                                value={formData?.username}
+                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                onKeyDown={checkError}
+                                onKeyUp={checkEnable}
+                            />
+                        </div>
+                    }
+                    {
+                        loginBy === "email" && <div>
+                            <InputLabel htmlFor="emailBox"
+                                sx={styleLabel}>
+                                Email:
+                            </InputLabel>
+                            <OutlinedInput
+                                error={objError.identifierError}
+                                id="emailBox"
+                                name="email"
+                                type="email"
+                                fullWidth
+                                value={formData?.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                onKeyDown={checkError}
+                                onKeyUp={checkEnable}
+                            />
+                        </div>
+                    }
+
+                    <InputLabel htmlFor="passwordBox"
+                        sx={styleLabel}>
+                        Password:
+                    </InputLabel>
                     <OutlinedInput required
                         error={objError.passwordError}
-                        label="Password"
                         id="passwordBox"
                         name="password"
                         type={showPassword ? 'text' : 'password'}
-                        endAdornment= {
+                        endAdornment={
                             <InputAdornment position="end">
                                 <IconButton
                                     aria-label="toggle password visibility"
@@ -122,15 +158,15 @@ export function LoginForm(): JSX.Element {
                                     edge="end" >
                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
-                            </InputAdornment> }
+                            </InputAdornment>}
                         fullWidth
                         value={formData?.password}
-                        onChange={(e)=> setFormData({...formData, password: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         onKeyDown={checkError}
                         onKeyUp={checkEnable}
                     />
                     <Button variant="contained" fullWidth disabled={disable} onClick={loginUser}>
-                        Register
+                        Login
                     </Button>
                 </Stack>
             </Box>

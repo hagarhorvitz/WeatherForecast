@@ -52,7 +52,7 @@ class UsersFacade:
             if error: raise ValidationError(error, StatusCode.BadRequest.value, credentials)
             user = self.logic.get_user_by_username_and_password(identifier, PasswordCyberHash.hash(password))
         else:
-            raise ValidationError("Please provide either all login inputs", StatusCode.BadRequest.value, credentials)
+            raise ValidationError("Please provide all login inputs", StatusCode.BadRequest.value, credentials)
         if not user: raise AuthenticationError("User not found, please try again", StatusCode.Unauthorized.value, credentials)
         if "password" in user: del user["password"]
         print(f"##login facade## user: {user}")

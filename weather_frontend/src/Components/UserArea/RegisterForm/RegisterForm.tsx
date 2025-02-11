@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import css from "./RegisterForm.module.css";
 import { RegisterUserProps } from "../../../Models/RegisterUserProps";
 import { userService } from "../../../Services/UserService";
-import { Box, Button, IconButton, InputAdornment, OutlinedInput, Stack, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, InputLabel, OutlinedInput, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNotify } from "../../../Context/NotifyContext";
 import { useAuth } from "../../../Context/AuthContext";
 
 export function RegisterForm(): JSX.Element {
-    
+
     const { notify } = useNotify();
-    const { setToken } = useAuth();
+    const { setUser } = useAuth();
 
     const [formData, setFormData] = useState<RegisterUserProps>({
         first_name: "",
@@ -30,7 +30,7 @@ export function RegisterForm(): JSX.Element {
         passwordError: false
     });
 
-    function checkError():void {
+    function checkError(): void {
         if (formData?.first_name?.length < 2 && formData?.first_name?.length !== 0) objError.firstnameError = true; else objError.firstnameError = false
         if (formData?.last_name?.length < 2 && formData?.last_name?.length !== 0) objError.lastnameError = true; else objError.lastnameError = false
         if (formData?.email?.length < 5 && formData?.email?.length !== 0) objError.emailError = true; else objError.emailError = false
@@ -38,7 +38,7 @@ export function RegisterForm(): JSX.Element {
         setObjError({ ...objError });
     };
 
-    function checkEnable(){
+    function checkEnable() {
         if (formData?.first_name?.length >= 2 && formData?.last_name?.length >= 2 && formData?.email?.length > 5 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
     };
 
@@ -70,8 +70,9 @@ export function RegisterForm(): JSX.Element {
 
     async function registerUser() {
         try {
-            const token = await userService.register(formData)
-            setToken(token);
+            const userData = await userService.register(formData)
+            console.log("registerForm userData: ", userData);
+            setUser(userData);
             notify.success("Register successfully!", 4000)
             navigate("/home")
         }
@@ -80,8 +81,15 @@ export function RegisterForm(): JSX.Element {
         }
     };
 
-    const gotoLogin = ()=> navigate("/login")
+    const gotoLogin = () => navigate("/login")
 
+    const styleLabel = {
+        color: "#004a4d",
+        alignSelf: 'flex-start',
+        paddingLeft: 1,
+        fontSize: 'large',
+        fontWeight: '500',
+    };
     return (
         <div className={css.RegisterForm}>
             <Box
@@ -93,49 +101,61 @@ export function RegisterForm(): JSX.Element {
                     Register
                 </Typography>
                 <Stack spacing={2}>
+                    <InputLabel htmlFor="firstNameBox"
+                        sx={styleLabel}>
+                        First Name:
+                    </InputLabel>
                     <OutlinedInput required
                         error={objError.firstnameError}
-                        label="First Name"
                         id="firstNameBox"
                         name="first_name"
                         type="text"
                         fullWidth
                         value={formData?.first_name}
-                        onChange={(e)=> setFormData({...formData, first_name: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                         onKeyDown={checkError}
                         onKeyUp={checkEnable}
                     />
+                    <InputLabel htmlFor="lastNameBox"
+                        sx={styleLabel}>
+                        Last Name:
+                    </InputLabel>
                     <OutlinedInput required
                         error={objError.lastnameError}
-                        label="Last Name"
                         id="lastNameBox"
                         name="last_name"
                         type="text"
                         fullWidth
                         value={formData?.last_name}
-                        onChange={(e)=> setFormData({...formData, last_name: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                         onKeyDown={checkError}
                         onKeyUp={checkEnable}
                     />
+                    <InputLabel htmlFor="emailBox"
+                        sx={styleLabel}>
+                        Email:
+                    </InputLabel>
                     <OutlinedInput required
                         error={objError.emailError}
-                        label="Email"
                         id="emailBox"
                         name="email"
                         type="email"
                         fullWidth
                         value={formData?.email}
-                        onChange={(e)=> setFormData({...formData, email: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         onKeyDown={checkError}
                         onKeyUp={checkEnable}
                     />
+                    <InputLabel htmlFor="passwordBox"
+                        sx={styleLabel}>
+                        Password:
+                    </InputLabel>
                     <OutlinedInput required
                         error={objError.passwordError}
-                        label="Password"
                         id="passwordBox"
                         name="password"
                         type={showPassword ? 'text' : 'password'}
-                        endAdornment= {
+                        endAdornment={
                             <InputAdornment position="end">
                                 <IconButton
                                     aria-label="toggle password visibility"
@@ -145,10 +165,10 @@ export function RegisterForm(): JSX.Element {
                                     edge="end" >
                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
-                            </InputAdornment> }
+                            </InputAdornment>}
                         fullWidth
                         value={formData?.password}
-                        onChange={(e)=> setFormData({...formData, password: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         onKeyDown={checkError}
                         onKeyUp={checkEnable}
                     />

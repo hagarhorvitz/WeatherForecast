@@ -1,4 +1,5 @@
 export class CredentialProps {
-    public identifier: string;
+    public username: string;
+    public email: string;
     public password: string;
 }

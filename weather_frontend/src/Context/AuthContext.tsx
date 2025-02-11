@@ -1,55 +1,63 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 import { UserModel } from '../Models/UserModel';
+import { useNavigate } from 'react-router-dom';
+import { userService } from '../Services/UserService';
 
 interface AuthContextProps {
   user: UserModel | null;
-  token: string | null;
-  setToken: (token: string | null) => void;
+//   token: string | null;
+//   setToken: (token: string | null) => void;
   setUser: (user: UserModel | null) => void;
-  logout: () => void;
+  log_out: () => void;
 }
 
 export const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 1) Initialize token from localStorage
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
-  // 2) Store the decoded user
+  // 1) Store the decoded user
   const [user, setUser] = useState<UserModel | null>(null);
-  // 3) Whenever token changes, decode the user (or clear it if no token)
+
   useEffect(() => {
-    if (token) {
+    async function fetchUser() {
       try {
-        // Example shape: { user: { ...UserModel... } }
-        const decodedUser = jwtDecode<{ user: UserModel }>(token).user;
-        console.log("AuthContext decodedUser: ", decodedUser);
-        setUser(decodedUser);
+        console.log("##AuthContext Fetching user after refresh...");  
+        const userData = await userService.getUserInfo(); // Fetch user from API
+        console.log("##AuthContext Fetched user:", userData);
+        // setUser(userData);
+        if (userData) {
+            setUser(userData);
+          }
       } catch (err) {
-        console.error('Token decode failed:', err);
+        console.error("##AuthContext Failed to fetch user:", err);
         setUser(null);
       }
-    } else {
-      setUser(null);
     }
-  }, [token]);
+    fetchUser();
+  }, []);
 
-  // 4) Provide a logout function that clears token + user
-  function logout() {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
+
+  const navigate = useNavigate();
+
+ async function log_out() {
+    try {
+        await userService.logout()
+        console.log("##AuthContext Logout successful!");
+        setUser(null);
+        navigate("/home")
+    } catch (err) {
+        console.error("##AuthContext Logout failed:", err);
+      }
+
   }
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        token,
-        setToken,
         setUser,
-        logout
+        log_out
       }}
     >
       {children}
@@ -57,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Helper hook so we can do: const { user, token, ... } = useAuth()
+// Helper hook so we can do: const { user, ... , ... } = useAuth()
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
@@ -65,3 +73,61 @@ export function useAuth() {
   }
   return context;
 }
+
+
+
+
+
+
+
+
+
+
+
+// export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+//     // 1) Initialize token from localStorage
+//     const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+//     // 2) Store the decoded user
+//     const [user, setUser] = useState<UserModel | null>(null);
+//     // 3) Whenever token changes, decode the user (or clear it if no token)
+//     useEffect(() => {
+//       if (token) {
+//         try {
+//           // Example shape: { user: { ...UserModel... } }
+//           const decodedUser = jwtDecode<{ user: UserModel }>(token).user;
+//           console.log("AuthContext decodedUser: ", decodedUser);
+//           setUser(decodedUser);
+//         } catch (err) {
+//           console.error('Token decode failed:', err);
+//           setUser(null);
+//         }
+//       } else {
+//         setUser(null);
+//       }
+//     }, [token]);
+  
+    
+//     const navigate = useNavigate();
+  
+//     // 4) Provide a logout function that clears token + user
+//     function log_out() {
+//       localStorage.removeItem('token');
+//       setToken(null);
+//       setUser(null);
+//       navigate("/home")
+//     }
+  
+//     return (
+//       <AuthContext.Provider
+//         value={{
+//           user,
+//           token,
+//           setToken,
+//           setUser,
+//           log_out
+//         }}
+//       >
+//         {children}
+//       </AuthContext.Provider>
+//     );
+//   };
