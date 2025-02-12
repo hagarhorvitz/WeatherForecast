@@ -20,6 +20,7 @@ class UsersFacade:
         print(f"##create_username facade## - username: {username}")
         return username
 
+
     def register_new_user(self, data):
         first_name = data.get("first_name", "").capitalize()
         last_name = data.get("last_name", "").capitalize()
@@ -58,6 +59,14 @@ class UsersFacade:
         print(f"##login facade## user: {user}")
         return user
 
+
+    def get_user_by_id(self, user_id):
+        print(f"##get_user_by_id facade## user_id: {user_id}")
+        user = self.logic.get_user_by_id(user_id)
+        if not user: raise AuthenticationError(f"User with ID ({user_id}) not found, please try again", StatusCode.NotFound.value)
+        if "password" in user: del user["password"]
+        print(f"##get_user_by_id facade## user: {user}")
+        return user
 
         
         

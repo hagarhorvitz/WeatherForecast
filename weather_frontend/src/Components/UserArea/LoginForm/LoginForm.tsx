@@ -31,7 +31,10 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
     });
 
     useEffect(() => {
-        setFormData({ ...formData, username: null, email: null })  
+        console.log("LoginForm loginBy: ", loginBy);
+        if (loginBy !== null){
+            setFormData({ ...formData, username: null, email: null }) 
+        }
     }, [loginBy]);
 
     function checkError(): void {

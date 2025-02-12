@@ -9,20 +9,20 @@ class UsersLogic:
     def get_user_by_email_and_password(self, email, password):
         query = "SELECT user_id, first_name, last_name, username, email FROM open_meteo_weather.users WHERE email = %s AND password = %s"
         result = self.dal.get_scalar(query, (email, password))
-        print(f"##Logic## email: {result}")
+        print(f"##Logic## by email: {result}")
         return result
     
     def get_user_by_username_and_password(self, username, password):
         query = "SELECT user_id, first_name, last_name, username, email FROM open_meteo_weather.users WHERE username = %s AND password = %s"
         result = self.dal.get_scalar(query, (username, password))
-        print(f"##Logic## username: {result}")
+        print(f"##Logic## by username: {result}")
         return result
     
-    # def get_user(self, hash_password, identifier):
-    #     query = "SELECT * FROM open_meteo_weather.users WHERE password = %s email = %s OR username = %s"
-    #     result = self.dal.get_scalar(query, (hash_password, identifier, identifier,))
-    #     print(f"result email: {result}")
-    #     return result
+    def get_user_by_id(self, user_id):
+        query = "SELECT user_id, first_name, last_name, username, email FROM open_meteo_weather.users WHERE user_id = %s"
+        user = self.dal.get_scalar(query, (user_id,))
+        print(f"##Logic## user by id: {user}")
+        return user
 
     def insert_new_user(self, user): ## send user object ##
         query = "INSERT INTO open_meteo_weather.users (first_name, last_name, username, email, password) VALUES (%s,%s,%s,%s,%s)"

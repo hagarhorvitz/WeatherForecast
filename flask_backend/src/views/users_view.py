@@ -2,7 +2,7 @@ from flask import Blueprint, make_response, request, jsonify
 from facades.users_facade import UsersFacade
 from models.error_model import *
 from models.status_code_model import StatusCode
-from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, jwt_required, set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt, get_jwt_identity, jwt_required, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 
 
 users_blueprint = Blueprint("users_view", __name__)
@@ -29,11 +29,9 @@ def register():
         if not isinstance(access_token, str):
             raise RuntimeError("Failed to generate a valid string access token")
 
-            # If desired, create a refresh token:
-        # refresh_token = create_refresh_token(identity=user_identity)
+        refresh_token = create_refresh_token(identity=user_identity)
 
         response = {
-            # "token": access_token,
             "user": {
                 "user_id": new_user["user_id"],
                 "username": new_user["username"],
@@ -45,17 +43,13 @@ def register():
         }
         print(f"##view register## response: {response}")
 
-            # Make a response object
         resp = make_response(jsonify(response), StatusCode.Created.value)
-        print(f"##view register## resp: {resp}")
 
         set_access_cookies(resp, access_token)  # ✅ Securely store token in an HttpOnly cookie
-        print("##view register## set access cookies: done✅")  
+        set_refresh_cookies(resp, refresh_token)
+        print("##view register## set access & refresh cookies: done✅")  
         print(f"##view register## resp Set-Cookie headers: {resp.headers.getlist('Set-Cookie')}")          
-            # If you want a separate refresh cookie:
-        # set_refresh_cookies(resp, refresh_token)
-
-        # return jsonify(response), StatusCode.Created.value
+        
         return resp
     except (ValidationError, AuthenticationError) as err:
         print(f"register ValidationError/AuthenticationError: {str(err.message)}\nstatus_code: {err.status_code}")
@@ -87,11 +81,9 @@ def log_in():
             raise RuntimeError("Failed to generate access token")
         if not isinstance(access_token, str):
             raise RuntimeError("Failed to generate a valid string access token")
-            # Optionally also create a refresh token
-        # refresh_token = create_refresh_token(identity=user_identity)
+        refresh_token = create_refresh_token(identity=user_identity)
 
         response = {
-            # "token": access_token,
             "user": {
                 "user_id": user["user_id"],
                 "username": user["username"],
@@ -103,16 +95,14 @@ def log_in():
         }
         print(f"##view log_in## response: {response}")
 
-        resp = make_response(jsonify(response), StatusCode.OK.value) #{"user": response["user"]}
-        print(f"##view log_in## resp: {resp}")
+        resp = make_response(jsonify(response), StatusCode.OK.value)
 
+            # ✅ Set access & refresh token cookies
         set_access_cookies(resp, access_token)  # ✅ Securely store token in an HttpOnly cookie
-        print("##view log_in## set access cookies: done✅")
+        set_refresh_cookies(resp, refresh_token)
+        print("##view register## set access & refresh cookies: done✅") 
         print(f"##view log_in## resp Set-Cookie headers: {resp.headers.getlist('Set-Cookie')}")
 
-        # set_refresh_cookies(resp, refresh_token)
-
-        # return jsonify(response), StatusCode.OK.value
         return resp
     except (ValidationError, AuthenticationError) as err:
         print(f"log_in ValidationError/AuthenticationError: {str(err.message)}\nstatus_code: {err.status_code}")
@@ -129,14 +119,15 @@ def log_in():
 @jwt_required()
 def logout():
     try:
-        resp = make_response(jsonify({"msg": "Logged out"}), StatusCode.OK.value)
-        print(f"##view Logout## resp: {resp}")
-        unset_jwt_cookies(resp)  # ✅ Unset JWT access token
+        response = make_response(jsonify({"msg": "Logged out"}), StatusCode.OK.value)
+        print(f"##view Logout## response: {response}")
+        unset_jwt_cookies(response)  # ✅ Unset JWT access token
             # ✅ Force delete cookies by setting an expired date
-        resp.set_cookie("access_token_cookie", "", expires=0, httponly=True, path="/")
-        resp.set_cookie("csrf_access_token", "", expires=0, httponly=True, path="/")
+        response.set_cookie("access_token_cookie", "", expires=0, httponly=True, path="/")
+        response.set_cookie("csrf_access_token", "", expires=0, httponly=True, path="/")
         print("Logout successful, cookies cleared✅")  # ✅ Debug log
-        return resp
+        print(f"##view Logout## resp after unset: {response}")
+        return response
     except Exception as err:
         print(f"Logout ExceptionError: {str(err)}")
         return jsonify({"Error": f"Error: {str(err)}"}), StatusCode.InternalServerError.value
@@ -160,7 +151,8 @@ def get_user_info():
             "email": user_claims["email"]
         }
         print(f"get_user_info()- user_data: {user_data}")
-        return jsonify({"user": user_data}), StatusCode.OK.value
+        response = make_response(jsonify({"user": user_data}), StatusCode.OK.value)
+        return response
     except RuntimeError as err_jwt:
         print(f"Logout RuntimeError: {str(err_jwt)}")
         return jsonify({"Error": f"Error: {str(err_jwt)}"})
@@ -169,3 +161,25 @@ def get_user_info():
         return jsonify({"Error": f"Error: {str(err)}"}), StatusCode.InternalServerError.value
 
 
+@users_blueprint.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)  # ✅ Requires a valid refresh token
+def refresh():
+    try:
+        user_identity = get_jwt_identity()  # Get user ID from refresh token
+        user = users_facade.get_user_by_id(int(user_identity)) # ✅ Rebuild additional claims for the new access token
+        additional_claims = {
+            "username": user["username"],
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "email": user["email"],
+        }
+        new_access_token = create_access_token(identity=user_identity, additional_claims=additional_claims)
+        response = make_response(jsonify({"msg": "Token refreshed!"}), StatusCode.OK.value)
+        set_access_cookies(response, new_access_token)  # ✅ Store new access token in cookies
+        return response
+    except AuthenticationError as err:
+        print(f"Refresh token AuthenticationError: {str(err.message)}\nstatus_code: {err.status_code}")
+        return jsonify({"Error": str(err.message)}), err.status_code
+    except Exception as err:
+        print(f"Refresh token error: {str(err)}")
+        return jsonify({"Error": "Could not refresh token"}), StatusCode.Unauthorized.value
