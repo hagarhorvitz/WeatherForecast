@@ -17,8 +17,8 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
     const { setUser } = useAuth();
 
     const [formData, setFormData] = useState<CredentialProps>({
-        username: null,
-        email: null,
+        identifier: loginBy,
+        identifierValue: "",
         password: "",
     });
     const [disable, setDisable] = useState<boolean>(false);
@@ -30,21 +30,16 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
         passwordError: false
     });
 
-    useEffect(() => {
-        console.log("LoginForm loginBy: ", loginBy);
-        if (loginBy !== null){
-            setFormData({ ...formData, username: null, email: null }) 
-        }
-    }, [loginBy]);
-
     function checkError(): void {
-        if ((formData?.username?.length < 4 && formData?.username?.length !== 0) || (formData?.email?.length < 4 && formData?.email?.length !== 0)) objError.identifierError = true; else objError.identifierError = false
+        // if ((formData?.username?.length < 4 && formData?.username?.length !== 0) || (formData?.email?.length < 4 && formData?.email?.length !== 0)) objError.identifierError = true; else objError.identifierError = false
+        if (formData?.identifierValue?.length < 4 && formData?.identifierValue?.length !== 0) objError.identifierError = true; else objError.identifierError = false
         if (formData?.password?.length < 4 && formData?.password?.length !== 0 && formData?.password?.length > 20) objError.passwordError = true; else objError.passwordError = false
         setObjError({ ...objError });
     };
 
     function checkEnable() {
-        if ((formData?.username?.length || formData?.email?.length) > 4 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
+        // if ((formData?.username?.length || formData?.email?.length) > 4 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
+        if (formData?.identifierValue?.length > 4 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
     };
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -115,8 +110,8 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
                                 name="username"
                                 type="text"
                                 fullWidth
-                                value={formData?.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                value={formData?.identifierValue}
+                                onChange={(e) => setFormData({ ...formData, identifier: e.target.name, identifierValue: e.target.value })}
                                 onKeyDown={checkError}
                                 onKeyUp={checkEnable}
                             />
@@ -134,8 +129,8 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
                                 name="email"
                                 type="email"
                                 fullWidth
-                                value={formData?.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                value={formData?.identifierValue}
+                                onChange={(e) => setFormData({ ...formData, identifier: e.target.name, identifierValue: e.target.value })}
                                 onKeyDown={checkError}
                                 onKeyUp={checkEnable}
                             />

@@ -6,9 +6,7 @@ import { LoginForm } from "../LoginForm/LoginForm";
 export function SelectLogin(): JSX.Element {
 
     const [isSelect, setIsSelect] = useState<boolean>(false);
-    // const [byEmail, setByEmail] = useState<boolean>(false);
-    // const [byUsername, setByUsername] = useState<boolean>(false);
-    const [value, setValue] = useState<string>(null);
+    const [value, setValue] = useState<string>("");
 
     function handleRadioChange(event: React.ChangeEvent<HTMLInputElement>) {
         setValue(event.target.value);
