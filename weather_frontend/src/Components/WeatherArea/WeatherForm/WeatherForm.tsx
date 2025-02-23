@@ -30,7 +30,6 @@ export function WeatherForm({ submitWeatherData }: FormSubmissionProps): JSX.Ele
             }));
         }
     };
-    // console.log('newWeather', newWeather)
 
     const hourlyVariables = [
         { inputValue: "temperature_2m", label: "Temperature (2 m)" },

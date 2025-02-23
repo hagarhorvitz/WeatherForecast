@@ -15,6 +15,13 @@ import { WeatherFormModel } from "../Models/WeatherFormModel";
 // }
 
 class WeatherServices {
+    private getCsrfToken(): string | null {
+        const match = document.cookie.match(new RegExp('(^| )csrf_access_token=([^;]+)'));
+        console.log("##service getCsrfToken()## match: ", match);
+        return match ? match[2] : null;
+        };
+
+        
 	public async fetchWeather (props:WeatherFormModel): Promise<WeatherModel> {
         console.log("service fetchWeather props: ", props);
         const queryParams = {
@@ -25,12 +32,15 @@ class WeatherServices {
         const response = await axios.get(appConfig.weatherUrl, {
             params: {
                 ...queryParams
-            }
+            },
+            withCredentials: true,
+            headers: {
+                "X-CSRF-TOKEN": this.getCsrfToken() || "",  // ✅ Include CSRF token
+            },
         });
         console.log("service fetchWeather response: ", response);
         console.log("service fetchWeather response.data: ", response.data);
         return response.data;
     };
 }
-
 export const weatherService = new WeatherServices();
