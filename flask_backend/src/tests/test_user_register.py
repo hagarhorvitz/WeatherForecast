@@ -35,7 +35,7 @@ def test_register_existing_email(client, user):
         "password": "password456"
     }
     response = client.post("/register", json=new_user_w_existing_email)
-    assert response.status_code == StatusCode.Unauthorized.value # ❌ Should return 401
+    assert response.status_code == StatusCode.BadRequest.value # ❌ Should return 400
     data = response.get_json()
     assert "Error" in data
     assert "Email" in data["Error"]

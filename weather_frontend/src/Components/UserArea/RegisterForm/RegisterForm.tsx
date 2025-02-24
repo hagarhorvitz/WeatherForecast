@@ -30,13 +30,13 @@ export function RegisterForm(): JSX.Element {
         passwordError: false
     });
 
-    function checkError(): void {
-        if (formData?.first_name?.length < 2 && formData?.first_name?.length !== 0) objError.firstnameError = true; else objError.firstnameError = false
-        if (formData?.last_name?.length < 2 && formData?.last_name?.length !== 0) objError.lastnameError = true; else objError.lastnameError = false
-        if (formData?.email?.length < 5 && formData?.email?.length !== 0) objError.emailError = true; else objError.emailError = false
-        if (formData?.password?.length < 4 && formData?.password?.length !== 0 && formData?.password?.length > 20) objError.passwordError = true; else objError.passwordError = false
-        setObjError({ ...objError });
-    };
+    // function checkError(): void {
+    //     if (formData?.first_name?.length < 2 && formData?.first_name?.length !== 0) objError.firstnameError = true; else objError.firstnameError = false
+    //     if (formData?.last_name?.length < 2 && formData?.last_name?.length !== 0) objError.lastnameError = true; else objError.lastnameError = false
+    //     if (formData?.email?.length < 5 && formData?.email?.length !== 0) objError.emailError = true; else objError.emailError = false
+    //     if ((formData?.password?.length < 4 || formData?.password?.length > 20) && formData?.password?.length !== 0) objError.passwordError = true; else objError.passwordError = false
+    //     setObjError({ ...objError });
+    // };
 
     function checkEnable() {
         if (formData?.first_name?.length >= 2 && formData?.last_name?.length >= 2 && formData?.email?.length > 5 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
@@ -112,8 +112,10 @@ export function RegisterForm(): JSX.Element {
                         type="text"
                         fullWidth
                         value={formData?.first_name}
-                        onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                        onKeyDown={checkError}
+                        onChange={(e) => {
+                            setFormData({ ...formData, first_name: e.target.value });
+                            setObjError({ ...objError, firstnameError: (e.target.value.length < 2 && e.target.value.length !== 0) ? true : false });
+                        }}
                         onKeyUp={checkEnable}
                     />
                     <InputLabel htmlFor="lastNameBox"
@@ -127,8 +129,10 @@ export function RegisterForm(): JSX.Element {
                         type="text"
                         fullWidth
                         value={formData?.last_name}
-                        onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                        onKeyDown={checkError}
+                        onChange={(e) => {
+                            setFormData({ ...formData, last_name: e.target.value });
+                            setObjError({ ...objError, lastnameError: (e.target.value.length < 2 && e.target.value.length !== 0) ? true : false });
+                        }}
                         onKeyUp={checkEnable}
                     />
                     <InputLabel htmlFor="emailBox"
@@ -142,8 +146,10 @@ export function RegisterForm(): JSX.Element {
                         type="email"
                         fullWidth
                         value={formData?.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        onKeyDown={checkError}
+                        onChange={(e) => {
+                            setFormData({ ...formData, email: e.target.value });
+                            setObjError({ ...objError, emailError: (e.target.value.length < 5 && e.target.value.length !== 0) ? true : false });
+                        }}
                         onKeyUp={checkEnable}
                     />
                     <InputLabel htmlFor="passwordBox"
@@ -168,8 +174,10 @@ export function RegisterForm(): JSX.Element {
                             </InputAdornment>}
                         fullWidth
                         value={formData?.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        onKeyDown={checkError}
+                        onChange={(e) => {
+                            setFormData({ ...formData, password: e.target.value });
+                            setObjError({ ...objError, passwordError: ((e.target.value.length < 4 || e.target.value.length > 20) && e.target.value.length !== 0) ? true : false });
+                        }}
                         onKeyUp={checkEnable}
                     />
                     <Button variant="contained" fullWidth disabled={disable} onClick={registerUser}>

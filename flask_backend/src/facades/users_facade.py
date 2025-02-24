@@ -30,7 +30,7 @@ class UsersFacade:
         new_user = UsersModel(None, first_name, last_name, username, email, password)
         error = new_user.validate_register()
         if error: raise ValidationError(error, StatusCode.BadRequest.value, new_user)
-        if self.logic.check_email_exists(email): raise AuthenticationError("Email is already exist in the system", StatusCode.Unauthorized.value, new_user)
+        if self.logic.check_email_exists(email): raise AuthenticationError("Email is already exist in the system", StatusCode.BadRequest.value, new_user)
         new_user.password = PasswordCyberHash.hash(new_user.password)
         user_id = self.logic.insert_new_user(new_user)
         new_user.user_id = user_id

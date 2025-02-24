@@ -31,7 +31,6 @@ class UserServices {
         console.log("##service login## CredentialProps: identifier-", identifier, "identifierValue-", identifierValue, "password-",password);
         const params = identifier === "username" ? { "username": identifierValue, "password": password } : { "email": identifierValue, "password": password };
         console.log("##service login## params: ", params);
-        console.log("##service login## this.getCsrfToken(): ", this.getCsrfToken());
         const response = await axios.post(appConfig.loginUrl, params, {
             withCredentials: true,
             headers: {

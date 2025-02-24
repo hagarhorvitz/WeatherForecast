@@ -30,13 +30,6 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
         passwordError: false
     });
 
-    function checkError(): void {
-        // if ((formData?.username?.length < 4 && formData?.username?.length !== 0) || (formData?.email?.length < 4 && formData?.email?.length !== 0)) objError.identifierError = true; else objError.identifierError = false
-        if (formData?.identifierValue?.length < 4 && formData?.identifierValue?.length !== 0) objError.identifierError = true; else objError.identifierError = false
-        if (formData?.password?.length < 4 && formData?.password?.length !== 0 && formData?.password?.length > 20) objError.passwordError = true; else objError.passwordError = false
-        setObjError({ ...objError });
-    };
-
     function checkEnable() {
         // if ((formData?.username?.length || formData?.email?.length) > 4 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
         if (formData?.identifierValue?.length > 4 && formData?.password?.length >= 4) setDisable(false); else setDisable(true)
@@ -111,9 +104,10 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
                                 type="text"
                                 fullWidth
                                 value={formData?.identifierValue}
-                                onChange={(e) => setFormData({ ...formData, identifier: e.target.name, identifierValue: e.target.value })}
-                                onKeyDown={checkError}
-                                onKeyUp={checkEnable}
+                                onChange={(e) => {
+                                    setFormData({ ...formData, identifier: e.target.name, identifierValue: e.target.value });
+                                    setObjError({ ...objError, identifierError: (e.target.value.length < 4 && e.target.value.length !== 0) ? true : false });
+                                }}                                onKeyUp={checkEnable}
                             />
                         </div>
                     }
@@ -130,8 +124,10 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
                                 type="email"
                                 fullWidth
                                 value={formData?.identifierValue}
-                                onChange={(e) => setFormData({ ...formData, identifier: e.target.name, identifierValue: e.target.value })}
-                                onKeyDown={checkError}
+                                onChange={(e) => {
+                                    setFormData({ ...formData, identifier: e.target.name, identifierValue: e.target.value });
+                                    setObjError({ ...objError, identifierError: (e.target.value.length < 5 && e.target.value.length !== 0) ? true : false });
+                                }}
                                 onKeyUp={checkEnable}
                             />
                         </div>
@@ -141,7 +137,7 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
                         sx={styleLabel}>
                         Password:
                     </InputLabel>
-                    <OutlinedInput required
+                    <OutlinedInput
                         error={objError.passwordError}
                         id="passwordBox"
                         name="password"
@@ -159,8 +155,10 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
                             </InputAdornment>}
                         fullWidth
                         value={formData?.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        onKeyDown={checkError}
+                        onChange={(e) => {
+                            setFormData({ ...formData, password: e.target.value });
+                            setObjError({ ...objError, passwordError: ((e.target.value.length < 4 || e.target.value.length > 20) && e.target.value.length !== 0) ? true : false });
+                        }}
                         onKeyUp={checkEnable}
                     />
                     <Button variant="contained" fullWidth disabled={disable} onClick={loginUser}>
