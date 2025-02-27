@@ -3,7 +3,8 @@ from facades.users_facade import UsersFacade
 from models.error_model import *
 from models.status_code_model import StatusCode
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt, get_jwt_identity, jwt_required, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
-
+from utils.email_service import send_registration_email
+from models.users_model import *
 
 users_blueprint = Blueprint("users_view", __name__)
 
@@ -14,7 +15,6 @@ def register():
     try:
         data = request.get_json()
         new_user = users_facade.register_new_user(data)
-            # Convert user_id to a string and store other user info in claims
         user_identity = str(new_user["user_id"])  # JWT `sub` must be a string!
         additional_claims = {
             "username": new_user["username"],
@@ -50,6 +50,8 @@ def register():
         print("##view register## set access & refresh cookies: done✅")  
         print(f"##view register## resp Set-Cookie headers: {resp.headers.getlist('Set-Cookie')}")          
         
+        send_registration_email(additional_claims)
+        print("##view register## email sent✅")  
         return resp
     except (ValidationError, AuthenticationError) as err:
         print(f"register ValidationError/AuthenticationError: {str(err.message)}\nstatus_code: {err.status_code}")

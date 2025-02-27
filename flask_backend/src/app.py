@@ -1,14 +1,25 @@
 import sys
 from flask import Flask, jsonify
+from flask_mail import Mail
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from models.status_code_model import StatusCode
 from utils.app_config import AppConfig
-from views.api_weather_view import api_weather_blueprint
-from views.users_view import users_blueprint
+
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
+
+# Load Email Configurations from AppConfig
+app.config["MAIL_SERVER"] = AppConfig.mail_server
+app.config["MAIL_PORT"] = AppConfig.mail_port
+app.config["MAIL_USE_TLS"] = AppConfig.mail_use_tls
+app.config["MAIL_USE_SSL"] = AppConfig.mail_use_ssl
+app.config["MAIL_USERNAME"] = AppConfig.mail_username
+app.config["MAIL_PASSWORD"] = AppConfig.mail_password
+app.config["MAIL_DEFAULT_SENDER"] = AppConfig.mail_default_sender
+# Initialize Flask-Mail
+mail = Mail(app)
 
 # Secret key and JWT setup
 app.secret_key = AppConfig.secret_key
@@ -32,6 +43,8 @@ app.config["JWT_COOKIE_CSRF_PROTECT"] = True      # Built-in CSRF protection
 
 jwt = JWTManager(app)
 
+from views.api_weather_view import api_weather_blueprint
+from views.users_view import users_blueprint
 app.register_blueprint(api_weather_blueprint)
 app.register_blueprint(users_blueprint)
 

@@ -73,7 +73,7 @@ export function RegisterForm(): JSX.Element {
             const userData = await userService.register(formData)
             console.log("registerForm userData: ", userData);
             setUser(userData);
-            notify.success("Register successfully!", 4000)
+            notify.success("Registered successfully!\nPlease check your mail and make sure you received a confirmation email with your info", 5000)
             navigate("/home")
         }
         catch (err) {
