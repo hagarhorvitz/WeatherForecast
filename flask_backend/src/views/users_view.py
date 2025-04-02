@@ -185,3 +185,9 @@ def refresh():
     except Exception as err:
         print(f"Refresh token error: {str(err)}")
         return jsonify({"Error": "Could not refresh token"}), StatusCode.Unauthorized.value
+
+
+@users_blueprint.route("/whatMyUsername", methods=["GET", "POST"])
+@jwt_required()
+def send_username_to_email():
+    pass

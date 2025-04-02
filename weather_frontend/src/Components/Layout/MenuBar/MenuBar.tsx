@@ -30,6 +30,7 @@ export function MenuBar(): JSX.Element {
                     <NavLink to="/weather">Get Weather</NavLink>&nbsp;
                     <div>
                         <span>Hello {user.first_name} {user.last_name}</span>&nbsp;
+                        {/* <button onClick={}>Remind me what is my Username</button>&nbsp; */}
                         <button onClick={log_out}>Logout</button>
                     </div>
                 </div>
