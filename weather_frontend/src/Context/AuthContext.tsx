@@ -4,6 +4,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { UserModel } from '../Models/UserModel';
 import { useNavigate } from 'react-router-dom';
 import { userService } from '../Services/UserService';
+import { useNotify } from './NotifyContext';
 
 interface AuthContextProps {
   user: UserModel | null;
@@ -16,6 +17,7 @@ interface AuthContextProps {
 export const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { notify } = useNotify();
     const [user, setUser] = useState<UserModel | null>(null);
     console.log("##AuthContext user:", user); // ✅ Debugging log
 
@@ -52,9 +54,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await userService.logout()
             console.log("##AuthContext Logout successful!");
             setUser(null);
+            notify.success("Logout successfully! See you next time 🤍", 4000)
             navigate("/home")
         } catch (err) {
             console.error("##AuthContext Logout failed:", err);
+            notify.error(err, 4500);
         }
     }
 

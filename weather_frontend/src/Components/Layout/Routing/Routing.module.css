@@ -1,3 +1,22 @@
 .Routing {
-	
+    height: 100%;
+    width: 100%;
+    padding: auto;
+    margin: 0 auto ;
+    text-align: center;
+    color: rgb(0, 16, 87);
+    /* align-content: space-around; */
+    overflow: auto;
+    /* border: 1px solid black; */
+    box-sizing: border-box; 
 }
+
+.Routing *{
+    box-sizing: border-box;
+}
+
+/* .Routing div[class*="HomePage"], 
+.Routing div[class*="PageNotFound"]{
+    
+    background-color: blanchedalmond;
+} */

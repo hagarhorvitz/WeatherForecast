@@ -1,3 +1,19 @@
 .LoginForm {
-	
+    width: 100%;
+    padding: auto;
+    margin: 0 auto ;
+    box-sizing: border-box;
+}
+.LoginForm input{
+    padding: 0.8vw;
+}
+
+.LoginForm input:autofill{
+    -webkit-text-fill-color: rgb(0, 16, 87) !important;
+    -webkit-box-shadow: 0 0 10px 10px rgb(83, 177, 253) inset, 0 0 0 100px rgb(158, 211, 255) inset ;
+    /* box-shadow: transparent; */
+    background-color: transparent !important;
+    text-align: flex-start;
+    padding-left: 1.2vw;
+    align-content: center;
 }

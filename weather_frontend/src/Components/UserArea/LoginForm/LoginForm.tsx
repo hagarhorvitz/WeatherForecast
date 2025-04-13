@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import css from "./LoginForm.module.css";
 import { userService } from "../../../Services/UserService";
-import { Box, Button, IconButton, InputAdornment, InputLabel, OutlinedInput, Stack, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, InputLabel, OutlinedInput, Stack, styled, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { CredentialProps } from "../../../Models/CredentialProps";
@@ -73,56 +73,102 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
         }
     };
     const styleLabel = {
-        color: "#004a4d",
+        color: "#001057",
         alignSelf: 'flex-start',
-        paddingLeft: 1,
-        fontSize: 'large',
+        paddingLeft: "1vw",
+        paddingTop: "1vw",
+        fontSize: '1.9vw',
         fontWeight: '500',
     };
+    const styleInput = {
+        color: "#001057",
+        fontSize: '1.8vw',
+        textAlign: "center",
+        border: "1.4px solid #001057",
+        boxSizing: "border-box",
+    };
+    const LoginButton = styled(Button)({
+        boxShadow: 'none',
+        textTransform: 'none',
+        fontSize: '1.8vw',
+        color: '#64b1f0',
+        width: '50%',
+        padding: '0.4vw 1vw',
+        margin: ' 2vw auto 0.1vw',
+        // border: '1px solid #001057',
+        // lineHeight: 1.5,
+        backgroundColor: '#001057',
+        fontFamily: [
+            'Inter', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'
+        ].join(','),
+        '&:focus': {
+            color: '#64b1f0',
+            backgroundColor: '#001057',
+            boxShadow: '0 0 10px 1px rgba(0, 8, 46, 0.21)',
+        },
+        '&:hover': {
+            color: '#001057',
+            backgroundColor: '#64b1f0',
+            fontWeight: '700',
+            border: '2px outset rgb(102, 185, 253)',
+            borderRadius: '5px',
+            boxShadow: '0 1px 5px 0 rgba(0, 10, 54, 0.205), 0 2px 10px 0 rgba(0, 10, 54, 0.205)',
+        },
+        '&:active': {
+            boxShadow: 'none',
+            backgroundColor: 'rgb(104, 187, 255)',
+            border: '2px inset rgba(104, 187, 255, 0.51)',
+        },
+      });
 
     return (
         <div className={css.LoginForm}>
-            <Typography variant="h5" gutterBottom>
-                Login
-            </Typography>
             <Box
                 component="form"
                 onKeyDown={handleKeyDown}
-                sx={{ maxWidth: 400, mx: "auto", mt: 4 }}
+                sx={{ maxWidth: "75%", margin: "auto", px: "3vw", py: "0.5vw" }}
             >
-                <Stack spacing={2}>
+                <Typography variant="h3" gutterBottom
+                    sx={{ color: "#001057", fontWeight: "bold", fontSize: "2.7vw", textAlign: "center", mt: "1vw", mb: "0.5vw", textShadow: "0 0 5px rgb(116, 192, 255)" }}>
+                    Login
+                </Typography>
+                <Stack spacing={0.8}>
                     {
-                        loginBy === "username" && <div>
+                        loginBy === "username" && <div style={{ textAlign: "start" }}>
                             <InputLabel htmlFor="usernameBox"
                                 sx={styleLabel}>
                                 Username:
                             </InputLabel>
                             <OutlinedInput
+                                sx={styleInput}
                                 error={objError.identifierError}
                                 id="usernameBox"
                                 name="username"
                                 type="text"
                                 fullWidth
+                                size="small"
                                 value={formData?.identifierValue}
                                 onChange={(e) => {
                                     setFormData({ ...formData, identifier: e.target.name, identifierValue: e.target.value });
                                     setObjError({ ...objError, identifierError: (e.target.value.length < 4 && e.target.value.length !== 0) ? true : false });
-                                }}                                onKeyUp={checkEnable}
+                                }} onKeyUp={checkEnable}
                             />
                         </div>
                     }
                     {
-                        loginBy === "email" && <div>
+                        loginBy === "email" && <div style={{ textAlign: "start" }}>
                             <InputLabel htmlFor="emailBox"
                                 sx={styleLabel}>
                                 Email:
                             </InputLabel>
                             <OutlinedInput
+                                sx={styleInput}
                                 error={objError.identifierError}
                                 id="emailBox"
                                 name="email"
                                 type="email"
                                 fullWidth
+                                size="small"
                                 value={formData?.identifierValue}
                                 onChange={(e) => {
                                     setFormData({ ...formData, identifier: e.target.name, identifierValue: e.target.value });
@@ -137,34 +183,41 @@ export function LoginForm({ loginBy }: LoginProps): JSX.Element {
                         sx={styleLabel}>
                         Password:
                     </InputLabel>
-                    <OutlinedInput
+                    <OutlinedInput required
+                        sx={styleInput}
                         error={objError.passwordError}
                         id="passwordBox"
                         name="password"
                         type={showPassword ? 'text' : 'password'}
                         endAdornment={
-                            <InputAdornment position="end">
+                            <InputAdornment className="MuiInputAdornment-sizeSmall" position="end">
                                 <IconButton
+                                    sx={{ color: "#001057", fontSize: "2.4vw" }}
                                     aria-label="toggle password visibility"
                                     onClick={handleClickShowPassword}
                                     onMouseDown={handleMouseDownPassword}
                                     onMouseUp={handleMouseUpPassword}
                                     edge="end" >
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    {showPassword ? <VisibilityOff fontSize="inherit"/> : <Visibility fontSize="inherit"/>}
                                 </IconButton>
                             </InputAdornment>}
-                        fullWidth
+                        size="small"
                         value={formData?.password}
                         onChange={(e) => {
                             setFormData({ ...formData, password: e.target.value });
                             setObjError({ ...objError, passwordError: ((e.target.value.length < 4 || e.target.value.length > 20) && e.target.value.length !== 0) ? true : false });
                         }}
-                        onKeyUp={checkEnable}
-                    />
-                    <Button variant="contained" fullWidth disabled={disable} onClick={loginUser}>
+                        onKeyUp={checkEnable} />
+                    {/* <Button variant="contained" fullWidth disabled={disable} onClick={loginUser}>
                         Login
-                    </Button>
+                    </Button> */}
                 </Stack>
+                <LoginButton 
+                    variant="contained" 
+                    disabled={disable} 
+                    onClick={loginUser}>
+                        Login
+                </LoginButton>
             </Box>
         </div>
     );

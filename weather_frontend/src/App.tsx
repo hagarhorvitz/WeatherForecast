@@ -9,13 +9,15 @@ function App() {
     // const notify = new Notify(enqueueSnackbar, closeSnackbar);
 
     return (
-        <div>
-            <menu>
+        <div className='App'>
+            {/* <header>
                 <MenuBar/>
-            </menu>
+            </header>
             <main>
                 <Routing/>
-            </main>
+            </main> */}
+            <MenuBar/>
+            <Routing/>
         </div>
     )
 }

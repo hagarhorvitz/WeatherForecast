@@ -1,3 +1,8 @@
 .SelectLogin {
-	
+    width: 100%;
+    padding: auto;
+    margin: 0 auto ;
+    /* border: 1px solid orange; */
+    box-sizing: border-box;
 }
+

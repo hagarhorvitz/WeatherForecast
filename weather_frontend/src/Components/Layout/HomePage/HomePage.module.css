@@ -1,3 +1,21 @@
 .HomePage {
-	
+    width: 100%;
+    padding: 0 auto;
+    margin: 1.8vw auto 0.1vw;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5vw;
+    /* border: 1px solid orange; */
+    box-sizing: border-box;
+}
+
+.HomeText {
+    font-size: 3vw;
+    font-weight: bold;
+}
+
+.HomeLogo {
+    width: 35%;
+    /* height: 20%; */
 }

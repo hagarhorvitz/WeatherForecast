@@ -15,33 +15,30 @@ export function MenuBar(): JSX.Element {
         navigate("/home")
     };
 
-    // function logoutUser(){
-
-    //     logout();
-
-    // }
-
-
     return (
         <div className={css.MenuBar}>
             {user ? (
-                <div>
-                    <NavLink to="/">Home</NavLink>&nbsp;
-                    <NavLink to="/weather">Get Weather</NavLink>&nbsp;
-                    <div>
-                        <span>Hello {user.first_name} {user.last_name}</span>&nbsp;
+                <div className={css.MenuBarContainer}>
+                    <div className={css.LeftMenuBar}>
+                    <NavLink to="/">Home</NavLink>&nbsp;|&nbsp;
+                    <NavLink to="/weather">Get Weather</NavLink>
+                    </div>
+                    <div className={css.RightMenuBar}>
+                        <span>Hey {user.first_name} {user.last_name}</span>&nbsp;|&nbsp;
                         {/* <button onClick={}>Remind me what is my Username</button>&nbsp; */}
                         <button onClick={log_out}>Logout</button>
                     </div>
                 </div>
 
             ) : (
-                <div>
-                    <NavLink to="/">Home</NavLink>&nbsp;
+                <div className={css.MenuBarContainer}>
+                    <div className={css.LeftMenuBar}>
+                    <NavLink to="/">Home</NavLink> | 
                     <button onClick={noUserNoWeather}>Get Weather</button>
-                    <div>
-                        <span>Hey you!</span>&nbsp;
-                        <NavLink to="/login">Login</NavLink>&nbsp;
+                    </div>
+                    <div className={css.RightMenuBar}>
+                        <span>Hello guest</span>&nbsp;|&nbsp;
+                        <NavLink to="/login">Login</NavLink>&nbsp;|&nbsp;
                         <NavLink to="/register">Register</NavLink>
                     </div>
                 </div>

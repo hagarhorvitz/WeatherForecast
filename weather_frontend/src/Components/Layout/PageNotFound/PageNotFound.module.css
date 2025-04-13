@@ -1,3 +1,8 @@
 .PageNotFound {
-	
+    font-size: 4vw;
+    font-weight: bold;
+    width: 100%;
+    /* padding: auto;
+    margin: 5vw auto 0.5vw; */
+    box-sizing: border-box;
 }
